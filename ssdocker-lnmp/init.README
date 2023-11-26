@@ -1,0 +1,40 @@
+######   ==目录说明==
+
+### .dockerfiles		原始dockerfile
+### code				存放代码
+###		code/www		web代码，php,html,js
+###		code/vhost		nginx的vhost配置文件
+###		code/gobin		go的二进制文件
+### data				容器需要持久化的数据，如mysql
+###		data/mysql		mysql的磁盘映射目录
+### logs				日志目录
+###		logs/nginx		nginx日志（含php-fpm）
+###		logs/mysql		mysql日志
+### shared				共享目录
+
+
+######   ==相对目录为ssdocker.yml所在目录==
+
+## 通用的全局共享目录，用于把容器的文件暴露给宿主
+GLOABLE_SHARED_FOLDER= ./shared
+
+## mysql,mongo,redis等存储服务的数据存放目录（.env）
+DATA_PATH_HOST=./data
+
+## 网站代码存放目录（.env）
+APP_CODE_PATH_HOST=./code/www
+
+## 网站VHOST文件存放目录（.env）
+NGINX_HOST_SITES_PATH=./code/vhost/
+
+## Nginx 日志目录（.env）
+NGINX_HOST_LOG_PATH=./logs/nginx/
+
+## PHP-FPM 日志目录（.env）
+PHP_FPM_HOST_LOG_PATH=./logs/php-fpm/
+
+## Mysql 日志目录（.env）
+MYSQL_HOST_LOG_PATH=./logs/mysql/
+
+
+
