@@ -1,0 +1,63 @@
+version: '2.2'
+networks:
+  elastic:
+    driver: bridge
+services:
+  es01:
+    image: elasticsearch:8.9.0
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - xpack.security.enabled=false
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - /share/homes/sword/docker_volumes/es/data/data01:/usr/share/elasticsearch/data
+      - /share/homes/sword/docker_volumes/es/logs/logs01:/usr/share/elasticsearch/logs
+      - /share/homes/sword/docker_volumes/es/plugins/plugins01:/usr/share/elasticsearch/plugins
+    ports:
+      - 9201:9200
+      - 9301:9300
+    networks:
+      - elastic
+  es02:
+    image: elasticsearch:8.9.0
+    container_name: es02
+    environment:
+      - node.name=es02
+      - cluster.name=es-docker-cluster
+      - xpack.security.enabled=false      
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - /share/homes/sword/docker_volumes/es/data/data02:/usr/share/elasticsearch/data
+      - /share/homes/sword/docker_volumes/es/logs/logs02:/usr/share/elasticsearch/logs
+      - /share/homes/sword/docker_volumes/es/plugins/plugins02:/usr/share/elasticsearch/plugins
+    ports:
+      - 9202:9200
+      - 9302:9300
+    networks:
+      - elastic
+  es03:
+     image: elasticsearch:8.9.0
+     container_name: es03
+     environment:
+       - node.name=es03
+       - cluster.name=es-docker-cluster
+       - xpack.security.enabled=false
+       - discovery.seed_hosts=es01,es02
+       - cluster.initial_master_nodes=es01,es02,es03
+       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+     volumes:
+       - /share/homes/sword/docker_volumes/es/data/data03:/usr/share/elasticsearch/data
+       - /share/homes/sword/docker_volumes/es/logs/logs03:/usr/share/elasticsearch/logs
+       - /share/homes/sword/docker_volumes/es/plugins/plugins03:/usr/share/elasticsearch/plugins
+     ports:
+       - 9203:9200
+       - 9303:9300
+     networks:
+       - elastic
+
