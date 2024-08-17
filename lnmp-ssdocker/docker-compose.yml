@@ -1,0 +1,81 @@
+version: '3'
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+volumes:
+  mysql:
+    driver: local
+
+services:
+
+### PHP-FPM ##############################################
+    php-fpm:
+      build:
+        context: ./.dockerfiles/php-fpm
+        args:
+          - SSDOCKER_PHP_VERSION=${PHP_VERSION}
+          - INSTALL_ZIP_ARCHIVE=true
+          - INSTALL_OPCACHE=true
+          - INSTALL_MYSQLI=true  
+          - INSTALL_INTL=true
+      volumes:
+        - ./.dockerfiles/php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
+        - ${VOLUMES_PATH_HOST}/code/www/:/var/www:cached
+        - ${VOLUMES_PATH_HOST}/logs/php-fpm/:/var/log/php-fpm
+      expose:
+        - "9000"
+      extra_hosts:
+        - "dockerhost:10.0.75.1"
+      environment:
+        - PHP_IDE_CONFIG=serverName=lnmp-ssdocker
+      networks:
+        - backend
+
+
+### NGINX Server #########################################
+    nginx:
+      build:
+        context: ./.dockerfiles/nginx
+        args:
+          - PHP_UPSTREAM_CONTAINER=php-fpm
+          - PHP_UPSTREAM_PORT=9000
+      privileged: true
+      volumes:
+        - ${VOLUMES_PATH_HOST}/code/www/:/var/www:cached
+        - ${VOLUMES_PATH_HOST}/logs/nginx/:/var/log/nginx
+        - ${VOLUMES_PATH_HOST}/code/vhost/:/etc/nginx/sites-available
+      ports:
+        - "80:80"
+        - "443:443"
+      depends_on:
+        - php-fpm
+      networks:
+        - frontend
+        - backend
+
+
+### MySQL ################################################
+    mysql:
+      build:
+        context: ./.dockerfiles/mysql
+        args:
+          - MYSQL_VERSION=latest
+      environment:
+        - MYSQL_DATABASE=default
+        - MYSQL_USER=default
+        - MYSQL_PASSWORD=secret
+        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+        - TZ=Asia/Shanghai
+      privileged: true
+      volumes:
+        - ${VOLUMES_PATH_HOST}/data/mysql:/var/lib/mysql
+        - ${VOLUMES_PATH_HOST}/logs/mysql/:/var/log/mysql
+      ports:
+        - "3306:3306"
+      networks:
+        - backend
+   
