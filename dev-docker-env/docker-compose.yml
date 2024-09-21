@@ -1,0 +1,16 @@
+services:
+    mysql:
+      restart: always
+      build:
+        context: ./mysql
+      environment:
+        - MYSQL_DATABASE=default
+        - MYSQL_USER=default
+        - MYSQL_PASSWORD=my_secret
+        - MYSQL_ROOT_PASSWORD=95279527
+      volumes:
+        - mysql-data:/var/lib/mysql
+      ports:
+        - "3306:3306"
+volumes:
+    mysql-data:
