@@ -1,15 +1,4 @@
-networks:
-  frontend:
-    driver: bridge
-  backend:
-    driver: bridge
-
-volumes:
-  mysql:
-    driver: local
-
 services:
-
 ### PHP-FPM ##############################################
     php-fpm:
       build:
@@ -31,7 +20,7 @@ services:
       environment:
         - PHP_IDE_CONFIG=serverName=lnmp-ssdocker
       networks:
-        - backend
+        - ssdocker
 
 
 ### NGINX Server #########################################
@@ -52,9 +41,7 @@ services:
       depends_on:
         - php-fpm
       networks:
-        - frontend
-        - backend
-
+        - ssdocker
 
 ### MySQL ################################################
     mysql:
@@ -75,7 +62,7 @@ services:
       ports:
         - "3306:3306"
       networks:
-        - backend
+        - ssdocker
 
 ### Bitwarden Password Manangement #######################
     bitwarden:
@@ -92,4 +79,12 @@ services:
         - "8012:3012"
       restart: always
       networks:
-        - backend
+        - ssdocker
+
+volumes:
+  mysql:
+    driver: local
+
+networks:
+  ssdocker:
+    driver: bridge
