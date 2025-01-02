@@ -1,85 +1,100 @@
 services:
-### PHP-FPM ##############################################
-    php-fpm:
-      build:
-        context: ./.dockerfiles/php-fpm
-        args:
-          - SSDOCKER_PHP_VERSION=${PHP_VERSION}
-          - INSTALL_ZIP_ARCHIVE=true
-          - INSTALL_OPCACHE=true
-          - INSTALL_MYSQLI=true
-          - INSTALL_INTL=true
-      volumes:
-        - ./.dockerfiles/php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
-        - ${VOLUMES_PATH_HOST}/code/www/:/var/www:cached
-        - ${VOLUMES_PATH_HOST}/logs/php-fpm/:/var/log/php-fpm
-      expose:
-        - "9000"
-      extra_hosts:
-        - "dockerhost:10.0.75.1"
-      environment:
-        - PHP_IDE_CONFIG=serverName=lnmp-ssdocker
-      networks:
-        - ssdocker
+  # PHP-FPM 
+  php-fpm:
+    build:
+      context: ./.dockerfiles/php-fpm
+      args:
+        - SSDOCKER_PHP_VERSION=${PHP_VERSION}
+        - INSTALL_ZIP_ARCHIVE=true
+        - INSTALL_OPCACHE=true
+        - INSTALL_MYSQLI=true
+        - INSTALL_INTL=true
+    volumes:
+      - ./.dockerfiles/php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
+      - ${VOLUMES_PATH_HOST}/code/www/:/var/www:cached
+      - ${VOLUMES_PATH_HOST}/logs/php-fpm/:/var/log/php-fpm
+    expose:
+      - "9000"
+    extra_hosts:
+      - "dockerhost:10.0.75.1"
+    environment:
+      - PHP_IDE_CONFIG=serverName=lnmp-ssdocker
+    networks:
+      - ssdocker
 
 
-### NGINX Server #########################################
-    nginx:
-      build:
-        context: ./.dockerfiles/nginx
-        args:
-          - PHP_UPSTREAM_CONTAINER=php-fpm
-          - PHP_UPSTREAM_PORT=9000
-      privileged: true
-      volumes:
-        - ${VOLUMES_PATH_HOST}/code/www/:/var/www:cached
-        - ${VOLUMES_PATH_HOST}/logs/nginx/:/var/log/nginx
-        - ${VOLUMES_PATH_HOST}/code/vhost/:/etc/nginx/sites-available
-      ports:
-        - "9000:80"
-        - "9043:443"
-      depends_on:
-        - php-fpm
-      networks:
-        - ssdocker
+  # NGINX Server 
+  nginx:
+    build:
+      context: ./.dockerfiles/nginx
+      args:
+        - PHP_UPSTREAM_CONTAINER=php-fpm
+        - PHP_UPSTREAM_PORT=9000
+    privileged: true
+    volumes:
+      - ${VOLUMES_PATH_HOST}/code/www/:/var/www:cached
+      - ${VOLUMES_PATH_HOST}/logs/nginx/:/var/log/nginx
+      - ${VOLUMES_PATH_HOST}/code/vhost/:/etc/nginx/sites-available
+    ports:
+      - "9000:80"
+      - "9043:443"
+    depends_on:
+      - php-fpm
+    networks:
+      - ssdocker
 
-### MySQL ################################################
-    mysql:
-      build:
-        context: ./.dockerfiles/mysql
-        args:
-          - MYSQL_VERSION=latest
-      environment:
-        - MYSQL_DATABASE=default
-        - MYSQL_USER=default
-        - MYSQL_PASSWORD=secret
-        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-        - TZ=Asia/Shanghai
-      privileged: true
-      volumes:
-        - ${VOLUMES_PATH_HOST}/data/mysql:/var/lib/mysql
-        - ${VOLUMES_PATH_HOST}/logs/mysql/:/var/log/mysql
-      ports:
-        - "3306:3306"
-      networks:
-        - ssdocker
+  # MySQL 8.4.3
+  mysql:
+    build:
+      context: ./.dockerfiles/mysql
+    environment:
+      - MYSQL_DATABASE=default
+      - MYSQL_USER=default
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=Asia/Shanghai
+    privileged: true
+    volumes:
+      - ${VOLUMES_PATH_HOST}/data/mysql:/var/lib/mysql
+      - ${VOLUMES_PATH_HOST}/logs/mysql/:/var/log/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - ssdocker
 
-### Bitwarden Password Manangement #######################
-    bitwarden:
-      image: vaultwarden/server:1.32.7
-      container_name: bitwarden
-      environment:
-        - SIGNUPS_ALLOWED=true
-        - INVITATIONS_ALLOWED=true
-        - ADMIN_TOKEN=${BW_ADMIN_TOKEN}
-      volumes:
-        - /var/data/docker-volumes/data/bitwarden/:/data/
-      ports:
-        - "8002:80"
-        - "8012:3012"
-      restart: always
-      networks:
-        - ssdocker
+  # Bitwarden Password Manangement 
+  bitwarden:
+    image: vaultwarden/server:1.32.7
+    container_name: bitwarden
+    environment:
+      - SIGNUPS_ALLOWED=true
+      - INVITATIONS_ALLOWED=true
+      - ADMIN_TOKEN=${BW_ADMIN_TOKEN}
+    volumes:
+      - ${VOLUMES_PATH_HOST}/data/bitwarden/:/data/
+    ports:
+      - "8002:80"
+      - "8012:3012"
+    restart: always
+    networks:
+      - ssdocker
+
+  # Fileserver
+  fileserver:
+    image: peterberweiler/fileserver
+    container_name: fileserver
+    environment:
+        # all of these are optional
+      - BASEPATH=/
+      - BASIC_AUTH_ENABLED=false 
+      - BASIC_AUTH_REALM=admin 
+      - BASIC_AUTH_USER=admin 
+      - BASIC_AUTH_PASSWORD=pino2025up 
+    volumes:
+      - ${VOLUMES_PATH_HOST}/files:/public
+    ports:
+      - "9080:80"
+    restart: unless-stopped
 
 volumes:
   mysql:

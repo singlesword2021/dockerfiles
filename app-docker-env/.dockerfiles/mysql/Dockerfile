@@ -1,19 +1,18 @@
-ARG MYSQL_VERSION=latest
-FROM mysql:${MYSQL_VERSION}
+
+## docker login --username=singlesword@126.com registry.cn-hangzhou.aliyuncs.com
+FROM registry.cn-hangzhou.aliyuncs.com/ss-prod/mysql:8.4.3
 
 LABEL maintainer="SwordLee <277850636@qq.com>"
-
-#####################################
-# Set Timezone
-#####################################
 
 ARG TZ=UTC
 ENV TZ ${TZ}
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && chown -R mysql:root /var/lib/mysql/
-RUN mkdir -p /var/log/mysql
-RUN chmod -R 777 /var/log/mysql
 
 COPY my.cnf /etc/mysql/conf.d/my.cnf
+
+RUN chmod 0444 /etc/mysql/conf.d/my.cnf
+
+RUN echo 'default-authentication-plugin=mysql_native_password' >> /etc/mysql/conf.d/my.cnf
 
 CMD ["mysqld"]
 
