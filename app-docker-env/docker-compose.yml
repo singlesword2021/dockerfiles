@@ -43,12 +43,10 @@ services:
     networks:
       - ssdocker
 
-  # MySQL
+  # MySQL 8.4.3
   mysql:
     build:
       context: ./.dockerfiles/mysql
-      args:
-        - MYSQL_VERSION=latest
     environment:
       - MYSQL_DATABASE=default
       - MYSQL_USER=default
