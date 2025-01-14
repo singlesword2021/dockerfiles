@@ -1,4 +1,6 @@
-FROM nginx:alpine
+
+## docker login --username=singlesword@126.com registry.cn-hangzhou.aliyuncs.coms
+FROM  registry.cn-hangzhou.aliyuncs.com/ss-prod/nginx:alpine
 
 LABEL maintainer="SwordLee <277850636@qq.com>"
 
@@ -6,13 +8,8 @@ RUN mkdir -p /etc/nginx/sites-available
 
 COPY nginx.conf /etc/nginx/
 
-# If you're in China, or you need to change sources, will be set CHANGE_SOURCE to true in .env.
-
-ARG CHANGE_SOURCE=false
-RUN if [ ${CHANGE_SOURCE} = true ]; then \
-    # Change application source from dl-cdn.alpinelinux.org to aliyun source
-    sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories \
-;fi
+# China specific sources
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories
 
 RUN apk update \
     && apk upgrade \

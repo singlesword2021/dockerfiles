@@ -12,12 +12,16 @@
 2. .env                            // 基本环境变量文件，也可以直接写在docker-compose.yml中
 3. docker-compose.yml              // 各个service的定义
 4. {VOLUMES_PATH_HOST}             // docker volumes 挂载目录，如果只使用local存储，可以不需要挂载
+5. {VOLUMES_PATH_HOST}/code/www/   // nginx web目录
+6. {VOLUMES_PATH_HOST}/code/vhost/ // nginx 配置目录
+7. {VOLUMES_PATH_HOST}/logs/       // 日志目录
+8. {VOLUMES_PATH_HOST}/data/       // 数据目录
 
 ## 服务启动方式
 cd app-docker-env &&docker-compose up -d {Service}
 
 ## 目前支持的服务
-1. mysql
+1. mysqlfdsfs
 2. nginx (depends on php-fpm)
 3. php-fpm
 4. bitwarden

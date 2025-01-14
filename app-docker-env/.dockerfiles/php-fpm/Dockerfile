@@ -12,9 +12,8 @@
 # Note: Base Image name format {image-tag}-{php-version}
 #
 
-ARG SSDOCKER_PHP_VERSION
-ARG BASE_IMAGE_TAG_PREFIX=20240127
-FROM laradock/php-fpm:${BASE_IMAGE_TAG_PREFIX}-${SSDOCKER_PHP_VERSION}
+## docker login --username=singlesword@126.com registry.cn-hangzhou.aliyuncs.com
+FROM registry.cn-hangzhou.aliyuncs.com/ss-prod/php-fpm:7.4
 
 LABEL maintainer="SwordLee <277850636@qq.com>"
 
