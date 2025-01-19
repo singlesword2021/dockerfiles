@@ -36,8 +36,8 @@ services:
       - ${VOLUMES_PATH_HOST}/logs/nginx/:/var/log/nginx
       - ${VOLUMES_PATH_HOST}/code/vhost/:/etc/nginx/sites-available
     ports:
-      - "9000:80"
-      - "9043:443"
+      - "80:80"
+      - "443:443"
     depends_on:
       - php-fpm
     networks:
