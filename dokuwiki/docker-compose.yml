@@ -10,6 +10,8 @@ services:
       - "8080:8080" # internal port is 8080, map to what you need
     environment:
       PHP_TIMEZONE: Asia/Shanghai
+      DOKUWIKI_USERNAME: admin  
+      DOKUWIKI_PASSWORD: dokuwiki@9527 
       #PHP_MEMORYLIMIT: 256M
       #PHP_UPLOADLIMIT: 128M
     volumes:
