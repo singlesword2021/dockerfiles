@@ -1,0 +1,28 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9527:5678" # 重要：仅映射到本地回环地址，防止外部直接访问
+    environment:
+      - N8N_PROTOCOL=https
+      - N8N_HOST=localhost # 或你的域名（未来）
+      # >>> 必须设置的安全配置 <<<
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=singlesword
+      - N8N_BASIC_AUTH_PASSWORD=sword_9527
+      # 其他配置
+      - WEBHOOK_URL=https://82.156.78.249:5678 # 同上，未来可改为域名
+      - N8N_ENCRYPTION_KEY=rhkL1iqNT3RQAew6joMaxg==
+      - NODE_ENV=production
+      - GENERIC_TIMEZONE=Asia/Shanghai
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./local-files:/files # 可选：用于文件操作
+
+volumes:
+  n8n_data:
