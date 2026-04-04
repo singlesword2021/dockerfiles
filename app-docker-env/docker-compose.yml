@@ -112,6 +112,42 @@ services:
     volumes:
       #- ./storage:/storage
       - ${VOLUMES_PATH_HOST}/data/dokuwiki-data:/storage
+    
+  # N8N
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      # Map container port 5678 to host port 9527 on all network interfaces
+      - "9527:5678" 
+    environment:
+      - N8N_PROTOCOL=http # Change to 'https' if a reverse proxy with SSL is set up in the future
+      - N8N_HOST=localhost 
+      - WEBHOOK_URL=http://82.156.78.249:9527
+      - NODE_ENV=production  # 
+      - GENERIC_TIMEZONE=Asia/Shanghai
+      # Mandatory Security Settings ===
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=singlesword
+      - N8N_BASIC_AUTH_PASSWORD=sword_9527
+      # Encryption key for securing credentials. KEEP THIS SAFE AND PERSISTENT.
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+
+      # === Performance & Data Management (Optimized for 2-core 4GB) ===
+      # Max payload size in MB for HTTP requests
+      - N8N_MAX_PAYLOAD_SIZE=8
+      # Enable automatic pruning of execution data
+      - EXECUTIONS_DATA_PRUNE=true
+      # Maximum age (in hours) to keep execution data
+      - EXECUTIONS_DATA_MAX_AGE=72
+      # Maximum number of execution entries to keep per workflow
+      - EXECUTIONS_DATA_PRUNE_MAX_ENTRIES=50
+      # Global limit for concurrent workflow executions
+      - EXECUTIONS_PROCESS_CONCURRENT_LIMIT=5
+    volumes:
+      - ${VOLUMES_PATH_HOST}/data/n8n/n8n-data:/home/node/.n8n
+      - ${VOLUMES_PATH_HOST}/data/n8n/n8n-local-files:/files
 
 volumes:
   mysql:

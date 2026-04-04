@@ -2,7 +2,7 @@
 
 ## 初始化方式
 1. 复制整个 app-docker-env 目录到某一目录
-2. 创建docker volumes目录, 例如：mkdir /var/data/docker-volume
+2. 创建docker volumes目录, 例如：mkdir /var/data/docker-volumes
 3. 修改.env中的 VOLUMES_PATH_HOST, 设置为上一步创建的目录, 例如：VOLUMES_PATH_HOST=/var/data/docker-volumes/
 4. 修改.env中的其它环境变量（如有必要）
 5. 修改docker-compose.yml 中的默认端口（如有必要）
