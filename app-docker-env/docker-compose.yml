@@ -152,7 +152,7 @@ services:
   # OpenClaw: AI agent management platform
   openclaw:
     # Recommended to use official stable image, Chinese optimized version is also available
-    #image: ghcr.io/openclaw/openclaw:latest
+    #image: ghcr.nju.edu.cn/openclaw/openclaw:latest
     image: ghcr.nju.edu.cn/1186258278/openclaw-zh:nightly
 
     container_name: openclaw
