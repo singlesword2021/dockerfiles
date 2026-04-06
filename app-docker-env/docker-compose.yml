@@ -152,8 +152,8 @@ services:
   # OpenClaw: AI agent management platform
   openclaw:
     # Recommended to use official stable image, Chinese optimized version is also available
-    #image: ghcr.nju.edu.cn/openclaw/openclaw:latest
-    image: ghcr.nju.edu.cn/1186258278/openclaw-zh:nightly
+    image: ghcr.nju.edu.cn/openclaw/openclaw:latest
+    #image: ghcr.nju.edu.cn/1186258278/openclaw-zh:nightly
 
     container_name: openclaw
     restart: unless-stopped  # Auto-restart after NAS reboot
@@ -170,6 +170,36 @@ services:
 
     environment:
       - NODE_ENV=production   # Set to production environment
+      - OPENCLAW_GATEWAY_BIND=lan  # fix the issue that the gateway cannot be accessed from the outside
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  openclaw2:
+    # Recommended to use official stable image, Chinese optimized version is also available
+    image: ghcr.nju.edu.cn/openclaw/openclaw:latest
+    #image: ghcr.nju.edu.cn/1186258278/openclaw-zh:nightly
+
+    container_name: openclaw2
+    restart: unless-stopped  # Auto-restart after NAS reboot
+
+    ports:
+      # Map ports, format: "Host port:Container port"
+      - "19789:18789"        # OpenClaw core communication port
+      - "4000:3000"          # Web UI console port
+
+    volumes:
+      # [Important] Replace the path before colon with your actual NAS path
+      - ${VOLUMES_PATH_HOST}/data/openclaw2/config:/home/node/.openclaw
+      - ${VOLUMES_PATH_HOST}/data/openclaw2/workspace:/home/node/.openclaw/workspace
+
+    environment:
+      - NODE_ENV=production   # Set to production environment
+      - OPENCLAW_GATEWAY_BIND=lan
 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
